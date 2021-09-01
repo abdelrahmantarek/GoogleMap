@@ -1,0 +1,33 @@
+PODS:
+  - Flutter (1.0.0)
+  - GoogleMaps (4.0.0):
+    - GoogleMaps/Maps (= 4.0.0)
+  - GoogleMaps/Base (4.0.0)
+  - GoogleMaps/Maps (4.0.0):
+    - GoogleMaps/Base
+  - low_calories_google_map (0.0.1):
+    - Flutter
+    - GoogleMaps (~> 4.0.0)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - low_calories_google_map (from `.symlinks/plugins/low_calories_google_map/ios`)
+
+SPEC REPOS:
+  trunk:
+    - GoogleMaps
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  low_calories_google_map:
+    :path: ".symlinks/plugins/low_calories_google_map/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  GoogleMaps: b7f7fc569a9b354a3af0d9729dbec40957b7d41e
+  low_calories_google_map: 1f702f12841f5b202d7964361708567b145b9df9
+
+PODFILE CHECKSUM: 4c96e3e0cf7dac1e2888a4a6787abad9188cd611
+
+COCOAPODS: 1.11.0.rc.1
