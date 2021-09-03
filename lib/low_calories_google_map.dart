@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -7,6 +8,73 @@ import 'package:low_calories_google_map/model/Polyline.dart';
 import 'package:low_calories_google_map/model/StyleColor.dart';
 export 'package:low_calories_google_map/model/StyleColor.dart';
 import 'package:low_calories_google_map/model/Styles.dart';
+
+
+class ScaleMarkerAnimation{
+  final double duration;
+  final double fromValue;
+  final double toValue;
+  final bool autoReverses;
+  ScaleMarkerAnimation({this.duration = 1.0,this.fromValue = 0.5,this.toValue = 2.0, this.autoReverses = true});
+  Map<String,dynamic> toJson() {
+    return {
+      "scale.duration":duration,
+      "scale.fromValue":fromValue,
+      "scale.toValue":toValue,
+      "scale.autoReverses":autoReverses,
+    };
+  }
+}
+
+class PositionMarker{
+  final double lat;
+  final double lng;
+  PositionMarker(this.lat, this.lng);
+  Map<String,dynamic> toJson() {
+    return {
+      "position.lat":lat,
+      "position.lng":lng,
+    };
+  }
+}
+
+class Marker{
+
+  String id;
+  ScaleMarkerAnimation? scaleMarkerAnimation;
+  double? width = 50.0;
+  double? opacity = 1.0;
+  double? height = 50.0;
+  String? assets;
+  PositionMarker? position;
+
+  Marker(this.id);
+
+  Future<String> base64String() async{
+    ByteData bytes = await rootBundle.load(assets!);
+    var buffer = bytes.buffer;
+    var m = base64.encode(Uint8List.view(buffer));
+    return m;
+  }
+
+}
+
+
+class UpdateMarker{
+
+
+  ScaleMarkerAnimation? scaleMarkerAnimation;
+  double? width = 50.0;
+  double? opacity = 1.0;
+  double? height = 50.0;
+  PositionMarker? position;
+
+  UpdateMarker();
+
+}
+
+
+
 
 
 class LowCaloriesGoogleMap {
@@ -30,12 +98,55 @@ class LowCaloriesGoogleMap {
     return version;
   }
 
-  static Future<String?> addMarker(String base64) async {
-    final String? version = await _channel.invokeMethod('addMarker',{
-      "base64": base64
-    });
+  static Future<String?> addMarker(Marker marker) async {
+
+    Map<String,dynamic> data = {
+      "base64": await marker.base64String(),
+      "size.width": marker.width,
+      "size.height": marker.height,
+      "opacity": marker.opacity,
+      "id": marker.id,
+    };
+
+
+    if(marker.position!=null){
+      data.addAll(marker.position!.toJson());
+    }
+
+    if(marker.scaleMarkerAnimation!=null){
+       data.addAll(marker.scaleMarkerAnimation!.toJson());
+    }
+
+    final String? version = await _channel.invokeMethod('addMarker',data);
+
     return version;
   }
+
+  static Future<String?> updateMarker(String id,UpdateMarker marker) async {
+
+    Map<String,dynamic> data = {
+      "size.width": marker.width,
+      "size.height": marker.height,
+      "opacity": marker.opacity,
+      "id": id,
+    };
+
+    if(marker.position!=null){
+      data.addAll(marker.position!.toJson());
+    }
+
+    if(marker.scaleMarkerAnimation!=null){
+       data.addAll(marker.scaleMarkerAnimation!.toJson());
+    }
+
+    final String? version = await _channel.invokeMethod('updateMarker',data);
+
+    return version;
+  }
+
+
+
+
 
   static List<List<double>>? decodePolyLine(String overviewPolyline){
     return PolylineDecoded.Decode(encodedString: overviewPolyline, precision: 5).decodedCoords;

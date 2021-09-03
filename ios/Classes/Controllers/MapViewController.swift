@@ -25,13 +25,13 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     var animatePolyline: AnimatePolyline?
     var lm:CLLocationManager!
 
+    var  markers = [String: GMSMarker]()
     
     // Cannot convert value of type 'Any?' to expected argument type 'String'
     // Consecutive statements on a line must be separated by ';'
 
     func addMapStyle(_ args: NSDictionary?,_ result:FlutterResult? = nil) {
         do {
-            
             let initParam = args!;
             let mapStyle = initParam["mapStyle"] as? String ?? String("w");
             mapView.mapStyle = try GMSMapStyle(jsonString: mapStyle);
@@ -63,7 +63,7 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     func animatePolyLine(_ call: FlutterMethodCall,_ result:FlutterResult){
         makeAnimatePolyline(route:getRoute(call) as [CLLocationCoordinate2D]);
         stepsCoords = (getRoute(call) as [CLLocationCoordinate2D]);
-        addMarker(stepsCoords[0])
+//        addMarker(stepsCoords[0])
     }
     
     
@@ -88,14 +88,16 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     
     // animate marker ---------
     
-    var marker:GMSMarker?
+
     
     
     func addMarker(_ position: CLLocationCoordinate2D){
-        self.marker = GMSMarker(position: position)
-        self.marker!.groundAnchor = CGPoint(x: CGFloat(0.5), y: CGFloat(0.5))
-        self.marker!.icon = self.createEndMaker()
-        self.marker!.map = self.mapView
+        var marker:GMSMarker?
+        marker = GMSMarker(position: position)
+        marker!.groundAnchor = CGPoint(x: CGFloat(0.5), y: CGFloat(0.5))
+        marker!.icon = self.createEndMaker()
+        marker!.map = self.mapView
+        marker!.value(forKey: "1")
         self.playAnimation()
     }
 
@@ -204,7 +206,7 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
         let base64 = initParam["base64"] as? String ?? String("w");
         let image = convertBase64StringToImage(imageBase64String: base64)
         
-        animateScaleMarker(image)
+        animateScaleMarker(image,args)
     }
 
     func convertBase64StringToImage (imageBase64String:String) -> UIImage {
@@ -219,46 +221,83 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     }
 
 
+
+    func animateScaleMarker(_ image :UIImage,_ args: NSDictionary?){
+        
+
+        
+        
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0,
+                        width: args?.value(forKey: "size.width") as! Double,
+                        height: args?.value(forKey: "size.height") as! Double
+        ))
+
+        
+        imageView.image = image
+        imageView.contentMode = .center
+        let pulseMarker = GMSMarker(position: CLLocationCoordinate2D(
+                      latitude: args?.value(forKey: "position.lat") as! Double,
+                      longitude: args?.value(forKey: "position.lng") as! Double
+        ))
+   
+        
+        if args?.object(forKey: "scale.duration") != nil {
+            CATransaction.setCompletionBlock {() -> Void in
+                //alpha Animation for the image
+                print(args?.value(forKey: "scale.autoReverses") as! Bool)
+                let animation = CABasicAnimation(keyPath: "transform.scale.xy")
+                animation.repeatCount = Float.infinity
+                animation.duration = args?.value(forKey: "scale.duration") as! Double
+                animation.fromValue = args?.value(forKey: "scale.fromValue") as! Double
+                animation.toValue = args?.value(forKey: "scale.toValue") as! Double
+                animation.isRemovedOnCompletion = false
+                animation.autoreverses = args?.value(forKey: "scale.autoReverses") as! Bool
+                pulseMarker.iconView?.layer.add(animation, forKey: "pulse")
+            }
+        }
+        
+        
+        pulseMarker.iconView = imageView
+        pulseMarker.opacity = args?.value(forKey: "opacity") as! Float
+        pulseMarker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
+        pulseMarker.map = mapView
+        
+        markers[args?.value(forKey: "id") as! String] = pulseMarker
+    }
     
     
     
-    func animateScaleMarker(_ image :UIImage){
+    func updateMarker(_ args: NSDictionary?,_ result:FlutterResult){
+        let marker = markers[args?.value(forKey: "id") as! String]
+        marker?.position = CLLocationCoordinate2D(
+            latitude: args?.value(forKey: "position.lat") as! Double,
+            longitude: args?.value(forKey: "position.lng") as! Double
+        );
+    }
+    
+    
+   func addImageMarker(_ image :UIImage){
         let position = self.stepsCoords[10]
         let m = GMSMarker(position: position)
-        
         //custom marker image
-        let pulseRingImg = UIImageView(frame: CGRect(x: -30, y: -30, width: 78, height: 78))
+        let pulseRingImg = UIImageView(frame: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
         pulseRingImg.image = image
-        pulseRingImg.isUserInteractionEnabled = false
-        CATransaction.begin()
-        CATransaction.setAnimationDuration(1.5)
-        
-        //transform scale animation
-        var theAnimation: CABasicAnimation?
-        theAnimation = CABasicAnimation(keyPath: "transform.scale.xy")
-        theAnimation?.repeatCount = Float.infinity
-        theAnimation?.autoreverses = false
-        theAnimation?.fromValue = Float(0.1)
-        theAnimation?.toValue = Float(1.0)
-        theAnimation?.isRemovedOnCompletion = false
-        
-        pulseRingImg.layer.add(theAnimation!, forKey: "pulse")
-        pulseRingImg.isUserInteractionEnabled = false
-        CATransaction.setCompletionBlock({() -> Void in
-            
-            //alpha Animation for the image
-            let animation = CAKeyframeAnimation(keyPath: "opacity")
-            animation.duration = 1.5
-            animation.repeatCount = Float.infinity
-            animation.values = [Float(1.0), Float(0.1)]
-            m.iconView?.layer.add(animation, forKey: "opacity")
-        })
-        
-        CATransaction.commit()
         m.iconView = pulseRingImg
         m.layer.addSublayer(pulseRingImg.layer)
         m.map = mapView
         m.groundAnchor = CGPoint(x: 0.5, y: 0.5)
     }
     
+  
+
+    
+}
+
+
+func isNull(_ someObject: AnyObject?) -> Bool {
+    guard let someObject = someObject else {
+        return true
+    }
+
+    return (someObject is NSNull)
 }

@@ -46,11 +46,13 @@ class FLNativeView: NSObject, FlutterPlatformView {
             controller.animatePolyLine(call,result)
       case "addMarker":
             controller.addMarkerBase64(call.arguments as? NSDictionary,result)
+      case "updateMarker":
+            controller.updateMarker(call.arguments as? NSDictionary,result)
         default:
             print("default ")
       }
     }
-    
+    // updateMarker
 
     func view() -> UIView {
         return controller.mapView
