@@ -10,7 +10,7 @@ class FLNativeView: NSObject, FlutterPlatformView {
     let controller : MapViewController = MapViewController()
   
     private var _view: UIView
-
+    private var eventSink: FlutterEventSink? = nil
     
     init(
         frame: CGRect,
@@ -21,6 +21,12 @@ class FLNativeView: NSObject, FlutterPlatformView {
         _view = UIView()
         GMSServices.provideAPIKey("AIzaSyDbTLcODdd9senLY6EkTs55lGK0Av9lx_4")
         controller.methodChannel = FlutterMethodChannel(name: "low_calories_google_map", binaryMessenger: messenger!);
+        
+       
+    
+//        eventSink = FlutterEventChannel(name: "low_calories_google_map", binaryMessenger:  messenger!)
+//        .setStreamHandler(self.stream)
+        
         super.init();
 
         
