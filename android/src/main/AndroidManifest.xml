@@ -1,3 +1,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="map.app.low_calories_google_map">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="map.app.low_calories_google_map">
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-feature android:name="android.hardware.location" android:required="true" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+
+    <!-- Required only when requesting background location access on
+           Android 10 (API level 29) and higher. -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- Recommended for Android 9 (API level 28) and lower. -->
+    <!-- Required for Android 10 (API level 29) and higher. -->
+<!--    <service-->
+<!--        android:name="map.app.low_calories_google_map.MyNavigationService"-->
+<!--        android:foregroundServiceType="location"-->
+<!--        tools:ignore="WrongManifestParent">-->
+<!--    </service>-->
+
 </manifest>

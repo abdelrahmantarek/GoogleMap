@@ -39,7 +39,7 @@ class FLNativeView: NSObject, FlutterPlatformView {
     
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        result("iOS " + UIDevice.current.systemVersion)
+//        result("iOS " + UIDevice.current.systemVersion)
         
         if controller.initResult == nil{
            controller.initResult = result
@@ -54,6 +54,8 @@ class FLNativeView: NSObject, FlutterPlatformView {
             controller.addMarkerBase64(call.arguments as? NSDictionary,result)
       case "updateMarker":
             controller.updateMarker(call.arguments as? NSDictionary,result)
+      case "getLocation":
+            controller.getLocation(result)
         default:
             print("default ")
       }

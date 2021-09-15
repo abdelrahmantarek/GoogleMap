@@ -1,108 +1,105 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:low_calories_google_map/model/Locaiton.dart';
+import 'package:low_calories_google_map/model/LocationData.dart';
+import 'package:low_calories_google_map/model/Marker.dart';
 import 'package:low_calories_google_map/model/Polyline.dart';
 import 'package:low_calories_google_map/model/StyleColor.dart';
 export 'package:low_calories_google_map/model/StyleColor.dart';
 import 'package:low_calories_google_map/model/Styles.dart';
+export 'package:low_calories_google_map/model/PositionMarker.dart';
+export 'package:low_calories_google_map/model/LocationData.dart';
+export 'package:low_calories_google_map/model/Marker.dart';
+export 'package:low_calories_google_map/model/ScaleMarkerAnimation.dart';
 import 'dart:math' as math;
 import 'package:vector_math/vector_math.dart';
+export 'package:low_calories_google_map/model/Locaiton.dart';
 
 
 
-class ScaleMarkerAnimation {
-  final double duration;
-  final double fromValue;
-  final double toValue;
-  final bool autoReverses;
-  ScaleMarkerAnimation(
-      {this.duration = 1.0,
-      this.fromValue = 0.5,
-      this.toValue = 2.0,
-      this.autoReverses = true});
-  Map<String, dynamic> toJson() {
-    return {
-      "scale.duration": duration,
-      "scale.fromValue": fromValue,
-      "scale.toValue": toValue,
-      "scale.autoReverses": autoReverses,
-    };
-  }
-}
 
-class PositionMarker {
-   double? lat;
-   double? lng;
-  PositionMarker(this.lat, this.lng);
 
-  PositionMarker.fromMap(Map<String,dynamic> data){
-    lat = data["lat"];
-    lng = data["lng"];
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "position.lat": lat,
-      "position.lng": lng,
-    };
-  }
-}
-
-class LocationData extends PositionMarker {
-  LocationData.fromMap(Map<String, dynamic> data) : super.fromMap(data);
-  LocationData(double? lat, double? lng) : super(lat, lng);
-}
-
-class Marker {
-  String id;
-  ScaleMarkerAnimation? scaleMarkerAnimation;
-  double? width = 50.0;
-  double? opacity = 1.0;
-  double? height = 50.0;
-  double? heading;
-  String? assets;
-  bool? isFlat;
-  PositionMarker? position;
-
-  Marker(this.id);
-
-  Future<String> base64String() async {
-    ByteData bytes = await rootBundle.load(assets!);
-    var buffer = bytes.buffer;
-    var m = base64.encode(Uint8List.view(buffer));
-    return m;
-  }
-}
-
-class UpdateMarker {
-  ScaleMarkerAnimation? scaleMarkerAnimation;
-  double? width = 50.0;
-  double? opacity = 1.0;
-  double? height = 50.0;
-  double? heading;
-  bool? isFlat;
-  PositionMarker? position;
-  UpdateMarker();
-}
 
 
 
 
 class LowCaloriesGoogleMap {
 
+
+
+
+
+
+
+
+
+
+
   static const MethodChannel _channel = const MethodChannel('low_calories_google_map');
   final _eventChannel = const EventChannel('low_calories_google_map/channels');
 
 
-  static Future<String?> get platformVersion async {
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
+
+
+
+
+
+
+  static Future<bool?> get gpsStatusAndroid async {
+    final bool? version = await _channel.invokeMethod('gpsStatusAndroid');
     return version;
   }
+
+
+
+  static Future<bool?> get locationStatusAndroid async {
+    final bool? version = await _channel.invokeMethod('locationStatusAndroid');
+    return version;
+  }
+
+
+
+  static Future<Location?> getLocation()async{
+
+    if(Platform.isAndroid){
+
+      bool? location = await locationStatusAndroid;
+      if(location! == false){
+        bool data = await _channel.invokeMethod('requestLocationPermissionAndroid');
+        if(data == false){
+          return null;
+        }
+      }
+
+
+      bool? gps = await gpsStatusAndroid;
+      if(gps! == false){
+        bool data = await _channel.invokeMethod('requestOpenGpsAndroid');
+        if(data == false){
+          return null;
+        }
+      }
+
+    }
+
+
+    if(Platform.isIOS){
+
+    }
+
+
+    final dynamic data = await _channel.invokeMethod('getLocation');
+    return Location.fromList(data);
+  }
+
+
+
+
 
   static Future<String?> animatePolyLine(
       {List<List<double>>? list, String? overviewPolyline}) async {
@@ -111,16 +108,43 @@ class LowCaloriesGoogleMap {
     return version;
   }
 
-  static Future<String?> addMapStyle(StyleColor styleColor) async {
-    final String? version = await _channel
+
+
+
+
+
+
+
+
+  static Future<bool?> addMapStyle(StyleColor styleColor) async {
+    final bool? version = await _channel
         .invokeMethod('mapStyle', {"mapStyle": _getStyle(styleColor)});
     return version;
   }
 
-  static Future<Location?> getLocation()async{
-    final dynamic data = await _channel.invokeMethod('getLocation');
-    return Location.fromJson(data);
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   Stream<LocationData> get onLocationChanged {
     return _eventChannel
@@ -129,6 +153,13 @@ class LowCaloriesGoogleMap {
           return LocationData.fromMap(Map<String, dynamic>.of(event.cast<String, dynamic>()));
     });
   }
+
+
+
+
+
+
+
 
 
   static Future<String?> addMarker(Marker marker) async {
@@ -161,6 +192,21 @@ class LowCaloriesGoogleMap {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   static Future<String?> updateMarker(String id, UpdateMarker marker) async {
 
     Map<String, dynamic> data = {
@@ -173,9 +219,11 @@ class LowCaloriesGoogleMap {
     if(marker.heading != null){
       data["heading"] = marker.heading;
     }
+
     if(marker.isFlat != null){
       data["isFlat"] = marker.isFlat;
     }
+
     if (marker.position != null) {
        data.addAll(marker.position!.toJson());
     }
@@ -190,10 +238,29 @@ class LowCaloriesGoogleMap {
   }
 
 
+
+
+
+
+
+
+
+
+
   static List<List<double>>? decodePolyLine(String overviewPolyline) {
     return PolylineDecoded.Decode(encodedString: overviewPolyline, precision: 5)
         .decodedCoords;
   }
+
+
+
+
+
+
+
+
+
+
 }
 
 
@@ -250,18 +317,30 @@ class GoogleMapLowCalories extends StatelessWidget {
   const GoogleMapLowCalories({Key? key, this.styleColor = StyleColor.Standard}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+
     final String viewType = '<platform-view-type>';
-    return UiKitView(
-      viewType: viewType,
-      layoutDirection: TextDirection.rtl,
-      creationParams: {"mapStyle": _getStyle(styleColor!)},
-      onPlatformViewCreated: (d) {
-        print("onPlatformViewCreated " + d.toString());
-      },
-      creationParamsCodec: const StandardMessageCodec(),
+
+    if(Platform.isIOS){
+      return UiKitView(
+        viewType: viewType,
+        layoutDirection: TextDirection.rtl,
+        creationParams: {"mapStyle": _getStyle(styleColor!)},
+        onPlatformViewCreated: (d) {
+          print("onPlatformViewCreated " + d.toString());
+        },
+        creationParamsCodec: const StandardMessageCodec(),
+      );
+    }
+
+    return Scaffold(
+      body: Center(
+        child: Text("is Android"),
+      ),
     );
+
   }
 }
+
 
 String _getStyle(StyleColor styleColor) {
 

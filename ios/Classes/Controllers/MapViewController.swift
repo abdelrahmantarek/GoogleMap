@@ -25,7 +25,6 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     var animatePolyline: AnimatePolyline?
     var lm:CLLocationManager!
     var  markers = [String: GMSMarker]()
-   
 
     
     func addMapStyle(_ args: NSDictionary?,_ result:FlutterResult? = nil) {
@@ -101,7 +100,12 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
         print("location manager :  ",newHeading.magneticHeading)
     }
   
-
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let userLocation :CLLocation = locations[0] as CLLocation
+        print("user latitude = \(userLocation.coordinate.latitude)")
+        print("user longitude = \(userLocation.coordinate.longitude)")
+    }
     
     func playAnimation(){
         lm = CLLocationManager()
@@ -112,6 +116,14 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     
     private func locationManager(manager: CLLocationManager!, didUpdateHeading newHeading: CLHeading!) {
             print("location manager :  ",newHeading.magneticHeading)
+    }
+    
+    func locationManager(_ manager: CLLocationManager!, didUpdateLocations locations: [CLLocation]) {
+        print(manager.location?.coordinate.latitude)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+              print("Error while updating location " + error.localizedDescription)
     }
     
     
@@ -186,6 +198,43 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
         );
     }
     
+    
+    
+    func getLocation(_ result:FlutterResult?){
+        print("get location")
+//        lm.requestAlwaysAuthorization()
+        // For use in foreground
+        // self.locationManager.requestWhenInUseAuthorization()
+//        if CLLocationManager.locationServicesEnabled() {
+//            print([lm.location?.coordinate.latitude,lm.location?.coordinate.longitude])
+//            result!([lm.location?.coordinate.latitude,lm.location?.coordinate.longitude])
+//        }
+        if (CLLocationManager.locationServicesEnabled()){
+            lm = CLLocationManager()
+            lm.delegate = self
+            lm.desiredAccuracy = kCLLocationAccuracyBest
+            lm.requestAlwaysAuthorization()
+//            lm.startUpdatingLocation()
+            result!([lm.location?.coordinate.latitude,lm.location?.coordinate.latitude])
+        }
+    }
+    
+    
+    
+    func getLocationStatus(_ result:FlutterResult){
+        if CLLocationManager.locationServicesEnabled() {
+            switch CLLocationManager.authorizationStatus() {
+                case .notDetermined, .restricted, .denied:
+                    result(false)
+                case .authorizedAlways, .authorizedWhenInUse:
+                    result(true)
+                @unknown default:
+                break
+            }
+            } else {
+                result(false)
+        }
+    }
     
    func addImageMarker(_ image :UIImage){
         let position = self.stepsCoords[10]

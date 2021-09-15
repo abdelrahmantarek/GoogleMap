@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -122,6 +121,11 @@ class _MyAppState extends State<MyApp> {
 
 
 
+  getLocation()async{
+    Location? location = await LowCaloriesGoogleMap.getLocation();
+    print("location : " + location!.toJson().toString());
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +155,10 @@ class _MyAppState extends State<MyApp> {
 
 
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: getLocation,
+          child: Icon(Icons.gps_fixed),
         ),
       ),
     );
