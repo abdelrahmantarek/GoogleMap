@@ -2,7 +2,7 @@ group 'map.app.low_calories_google_map'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.3.72'
+    ext.kotlin_version = '1.3.50'
     repositories {
         google()
         jcenter()
