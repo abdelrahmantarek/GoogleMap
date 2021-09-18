@@ -1,5 +1,49 @@
 
+import 'dart:convert';
+
+import 'package:low_calories_google_map/model/StyleColor.dart';
+
 class Styles{
+
+  static String getStyle(StyleColor styleColor) {
+
+    var style = Styles.standard;
+
+    switch (styleColor) {
+      case StyleColor.Standard:
+        style = Styles.standard;
+        break;
+      case StyleColor.Silver:
+        style = Styles.sliver;
+        break;
+      case StyleColor.Retro:
+        style = Styles.retro;
+        break;
+      case StyleColor.Dark:
+        style = Styles.dark;
+        break;
+      case StyleColor.Night:
+        style = Styles.night;
+        break;
+      case StyleColor.Aubergine:
+        style = Styles.aubergine;
+        break;
+    }
+// How do I remove building interiors from Google maps using styles
+// https://stackoverflow.com/questions/14442599/how-do-i-remove-building-interiors-from-google-maps-using-styles
+    List list = [
+// {"stylers": [{ "visibility": "off" },]},
+      {
+        "featureType": "road",
+        "stylers": [
+          {"visibility": "on"}
+        ]
+      },
+    ];
+    list.addAll(style);
+    return jsonEncode(list);
+  }
+
 
   static var standard = [];
 

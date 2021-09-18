@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:low_calories_google_map/Helper/GoogleMapHelper.dart';
 import 'package:low_calories_google_map/model/Locaiton.dart';
 import 'package:low_calories_google_map/model/LocationData.dart';
 import 'package:low_calories_google_map/model/Marker.dart';
@@ -16,10 +17,9 @@ export 'package:low_calories_google_map/model/PositionMarker.dart';
 export 'package:low_calories_google_map/model/LocationData.dart';
 export 'package:low_calories_google_map/model/Marker.dart';
 export 'package:low_calories_google_map/model/ScaleMarkerAnimation.dart';
-import 'dart:math' as math;
-import 'package:vector_math/vector_math.dart';
 export 'package:low_calories_google_map/model/Locaiton.dart';
-
+export 'package:low_calories_google_map/Helper/GoogleMapHelper.dart';
+export 'package:low_calories_google_map/GoogleMapView.dart';
 
 
 
@@ -57,10 +57,32 @@ class LowCaloriesGoogleMap {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
   static Future<bool?> get locationStatusAndroid async {
     final bool? version = await _channel.invokeMethod('locationStatusAndroid');
     return version;
   }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -101,12 +123,43 @@ class LowCaloriesGoogleMap {
 
 
 
-  static Future<String?> animatePolyLine(
-      {List<List<double>>? list, String? overviewPolyline}) async {
-    final String? version = await _channel.invokeMethod('animatePolyLine',
-        [overviewPolyline != null ? decodePolyLine(overviewPolyline) : list]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  static Future<String?> animatePolyLine({List<List<double>>? list, String? overviewPolyline}) async {
+    final String? version = await _channel.invokeMethod('animatePolyLine', [overviewPolyline != null ? decodePolyLine(overviewPolyline) : list]);
     return version;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -117,12 +170,9 @@ class LowCaloriesGoogleMap {
 
 
   static Future<bool?> addMapStyle(StyleColor styleColor) async {
-    final bool? version = await _channel
-        .invokeMethod('mapStyle', {"mapStyle": _getStyle(styleColor)});
+    final bool? version = await _channel.invokeMethod('mapStyle', {"mapStyle": Styles.getStyle(styleColor)});
     return version;
   }
-
-
 
 
 
@@ -153,6 +203,22 @@ class LowCaloriesGoogleMap {
           return LocationData.fromMap(Map<String, dynamic>.of(event.cast<String, dynamic>()));
     });
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -242,68 +308,16 @@ class LowCaloriesGoogleMap {
 
 
 
-
-
-
-
-
-  static List<List<double>>? decodePolyLine(String overviewPolyline) {
-    return PolylineDecoded.Decode(encodedString: overviewPolyline, precision: 5)
-        .decodedCoords;
-  }
-
-
-
-
-
-
-
-
-
-
 }
 
 
 
 
 
-double getRotationToLocation(double currentLatitude, double currentLongitude,
-    double targetLatitude, double targetLongitude) {
-  var la_rad = radians(currentLatitude);
-  var lo_rad = radians(currentLongitude);
 
-  var de_la = radians(targetLatitude);
-  var de_lo = radians(targetLongitude);
 
-  var toDegrees = degrees(math.atan(math.sin(de_lo - lo_rad) /
-      ((math.cos(la_rad) * math.tan(de_la)) - (math.sin(la_rad) * math.cos(de_lo - lo_rad)))));
-  if (la_rad > de_la) {
-    if ((lo_rad > de_lo || lo_rad < radians(-180.0) + de_lo) &&
-        toDegrees > 0.0 &&
-        toDegrees <= 90.0) {
-      toDegrees += 180.0;
-    } else if (lo_rad <= de_lo &&
-        lo_rad >= radians(-180.0) + de_lo &&
-        toDegrees > -90.0 &&
-        toDegrees < 0.0) {
-      toDegrees += 180.0;
-    }
-  }
-  if (la_rad < de_la) {
-    if ((lo_rad > de_lo || lo_rad < radians(-180.0) + de_lo) &&
-        toDegrees > 0.0 &&
-        toDegrees < 90.0) {
-      toDegrees += 180.0;
-    }
-    if (lo_rad <= de_lo &&
-        lo_rad >= radians(-180.0) + de_lo &&
-        toDegrees > -90.0 &&
-        toDegrees <= 0.0) {
-      toDegrees += 180.0;
-    }
-  }
-  return toDegrees;
-}
+
+
 
 /*
   final networkStream = _eventChannel
@@ -312,71 +326,5 @@ double getRotationToLocation(double currentLatitude, double currentLongitude,
       .map((dynamic event) => intToConnection(event as int));
  */
 
-class GoogleMapLowCalories extends StatelessWidget {
-  final StyleColor? styleColor;
-  const GoogleMapLowCalories({Key? key, this.styleColor = StyleColor.Standard}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-
-    final String viewType = '<platform-view-type>';
-
-    if(Platform.isIOS){
-      return UiKitView(
-        viewType: viewType,
-        layoutDirection: TextDirection.rtl,
-        creationParams: {"mapStyle": _getStyle(styleColor!)},
-        onPlatformViewCreated: (d) {
-          print("onPlatformViewCreated " + d.toString());
-        },
-        creationParamsCodec: const StandardMessageCodec(),
-      );
-    }
-
-    return Scaffold(
-      body: Center(
-        child: Text("is Android"),
-      ),
-    );
-
-  }
-}
 
 
-String _getStyle(StyleColor styleColor) {
-
-  var style = Styles.standard;
-
-  switch (styleColor) {
-    case StyleColor.Standard:
-      style = Styles.standard;
-      break;
-    case StyleColor.Silver:
-      style = Styles.sliver;
-      break;
-    case StyleColor.Retro:
-      style = Styles.retro;
-      break;
-    case StyleColor.Dark:
-      style = Styles.dark;
-      break;
-    case StyleColor.Night:
-      style = Styles.night;
-      break;
-    case StyleColor.Aubergine:
-      style = Styles.aubergine;
-      break;
-  }
-// How do I remove building interiors from Google maps using styles
-// https://stackoverflow.com/questions/14442599/how-do-i-remove-building-interiors-from-google-maps-using-styles
-  List list = [
-// {"stylers": [{ "visibility": "off" },]},
-    {
-      "featureType": "road",
-      "stylers": [
-        {"visibility": "on"}
-      ]
-    },
-  ];
-  list.addAll(style);
-  return jsonEncode(list);
-}
