@@ -2,6 +2,12 @@
 
 import 'dart:math' show pow, sin, cos, pi, sqrt;
 
+
+
+import 'package:flutter/material.dart';
+import 'package:low_calories_google_map/low_calories_google_map.dart';
+import 'package:low_calories_google_map/model/RouteMap.dart';
+
 /*
 * Polyline Encoding Algorithm
 *
@@ -16,7 +22,61 @@ import 'dart:math' show pow, sin, cos, pi, sqrt;
 * Todo write tests
 * */
 
+class PolyLineAnimated{
+  final double? duration;
+  PolyLineAnimated({this.duration = 4.0});
+}
 
+class Polyline{
+  final Color? color;
+  final double? strokeWidth;
+  final PolyLineAnimated? polyLineAnimated;
+  final List<Location>? points;
+  Polyline({required this.points,this.color = Colors.black, this.strokeWidth = 2.0, this.polyLineAnimated});
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  ///
+  //
+
+  Map<String,dynamic> toJson(){
+    Map<String,dynamic> data = {};
+    data["polyLine.color"] = color!.toHex();
+    data["polyLine.strokeWidth"] = strokeWidth;
+    data["polyLine.points"] = [points!.toListDouble()];
+    if(polyLineAnimated!=null){
+      data["polyLine.duration"] = polyLineAnimated!.duration;
+    }
+    return data;
+  }
+}
+
+extension ExtensionLocationList on List<Location> {
+
+  List<List<double>> toListDouble(){
+    List<List<double>> l = [];
+    for(Location location in this){
+      l.add([location.lat!,location.lng!]);
+    }
+    return l;
+  }
+
+}
+
+extension HexColor on Color {
+  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
+  static Color fromHex(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${alpha.toRadixString(16).padLeft(2, '0')}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
+}
 class PolylineDecoded {
   //  --- Instance Variables
   bool? get isPolyline => true;

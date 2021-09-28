@@ -1,6 +1,7 @@
 
 
 import 'dart:math' as math;
+import 'package:low_calories_google_map/low_calories_google_map.dart';
 import 'package:low_calories_google_map/model/Polyline.dart';
 import 'package:vector_math/vector_math.dart';
 
@@ -47,4 +48,12 @@ double getRotationToLocation(double currentLatitude, double currentLongitude,
 List<List<double>>? decodePolyLine(String overviewPolyline) {
 return PolylineDecoded.Decode(encodedString: overviewPolyline, precision: 5)
     .decodedCoords;
+}
+
+List<Location>? decodePolyLineLocation(String overviewPolyline) {
+  List<Location> list = [];
+  for(List<double> s in PolylineDecoded.Decode(encodedString: overviewPolyline, precision: 5).decodedCoords!){
+    list.add(Location(s[0], s[1]));
+  }
+  return list;
 }

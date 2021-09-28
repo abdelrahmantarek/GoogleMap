@@ -5,27 +5,27 @@ import 'package:low_calories_google_map/model/StyleColor.dart';
 
 class Styles{
 
-  static String getStyle(StyleColor styleColor) {
+  static String getStyle(MapStyle styleColor) {
 
     var style = Styles.standard;
 
     switch (styleColor) {
-      case StyleColor.Standard:
+      case MapStyle.Standard:
         style = Styles.standard;
         break;
-      case StyleColor.Silver:
+      case MapStyle.Silver:
         style = Styles.sliver;
         break;
-      case StyleColor.Retro:
+      case MapStyle.Retro:
         style = Styles.retro;
         break;
-      case StyleColor.Dark:
+      case MapStyle.Dark:
         style = Styles.dark;
         break;
-      case StyleColor.Night:
+      case MapStyle.Night:
         style = Styles.night;
         break;
-      case StyleColor.Aubergine:
+      case MapStyle.Aubergine:
         style = Styles.aubergine;
         break;
     }

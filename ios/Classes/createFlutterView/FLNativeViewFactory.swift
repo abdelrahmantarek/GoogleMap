@@ -11,6 +11,7 @@ import Foundation
 class FLNativeViewFactory: NSObject, FlutterPlatformViewFactory {
     
     private var messenger: FlutterBinaryMessenger
+    var viewId: Int64 = 0
 
     
     init(messenger: FlutterBinaryMessenger) {
@@ -23,6 +24,7 @@ class FLNativeViewFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
+        self.viewId = viewId
         return FLNativeView(
             frame: frame,
             viewIdentifier: viewId,

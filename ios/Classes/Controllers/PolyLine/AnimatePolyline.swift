@@ -7,6 +7,8 @@
 
 import GoogleMaps
 
+
+
 open class AnimatePolyline {
     
     private lazy var currentSegment = GMSPolyline()
@@ -24,8 +26,14 @@ open class AnimatePolyline {
             updateOverlay()
         }
     }
+    
+    
+    
     open var duration: TimeInterval = 3.0
-    open var strokeColor: UIColor = .black {
+    
+    
+    
+    open var strokeColor: UIColor = UIColor(rgb: 0xFFFFFF) {
         didSet {
             currentSegment.strokeColor = strokeColor
             backgroundSegment.strokeColor = strokeColor
@@ -113,6 +121,7 @@ open class AnimatePolyline {
 
 // MARK: - Utitlities
 fileprivate extension AnimatePolyline {
+    
     private func createStartMaker() -> UIImage {
         let ovalPath = UIBezierPath()
         ovalPath.addArc(withCenter: CGPoint(x: 7.5, y: 7.5), radius: 7.5,
@@ -171,4 +180,23 @@ fileprivate extension UIImage {
         UIGraphicsEndImageContext()
         return colored
     }
+}
+
+
+extension UIColor {
+   convenience init(red: Int, green: Int, blue: Int) {
+       assert(red >= 0 && red <= 255, "Invalid red component")
+       assert(green >= 0 && green <= 255, "Invalid green component")
+       assert(blue >= 0 && blue <= 255, "Invalid blue component")
+
+       self.init(red: CGFloat(red) / 255.0, green: CGFloat(green) / 255.0, blue: CGFloat(blue) / 255.0, alpha: 1.0)
+   }
+
+   convenience init(rgb: Int) {
+       self.init(
+           red: (rgb >> 16) & 0xFF,
+           green: (rgb >> 8) & 0xFF,
+           blue: rgb & 0xFF
+       )
+   }
 }

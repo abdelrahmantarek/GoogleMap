@@ -1,5 +1,5 @@
 
-enum StyleColor{
+enum MapStyle{
   Standard,
   Silver,
   Retro,
