@@ -101,12 +101,7 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     }
   
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let userLocation :CLLocation = locations[0] as CLLocation
-        print("user latitude = \(userLocation.coordinate.latitude)")
-        print("user longitude = \(userLocation.coordinate.longitude)")
-    }
-    
+
     func playAnimation(){
         lm = CLLocationManager()
         lm.delegate = self
@@ -115,13 +110,7 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     
     
     
-    func locationManager(_ manager: CLLocationManager!, didUpdateLocations locations: [CLLocation]) {
-        print(manager.location?.coordinate.latitude)
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-              print("Error while updating location " + error.localizedDescription)
-    }
+ 
     
     
     func addMarkerBase64(_ args: NSDictionary?,_ result:FlutterResult){
@@ -147,12 +136,6 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
         return newImage
     }
     
-    
-    func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
-        DispatchQueue.main.async {
-            self.markers.values.first?.icon = self.imageWithImage(image: #imageLiteral(resourceName: "icnMapmarker"), scaledToSize: CGSize(width: 60.0, height: 60.0))
-        }
-    }
 
     
     func animateScaleMarker(_ image :UIImage,_ args: NSDictionary?){
@@ -199,6 +182,11 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     }
     
     
+    func getPointScreenFromMapView(_ args: NSDictionary?,_ result:FlutterResult){
+        let point = mapView.projection
+            .point(for: CLLocationCoordinate2D(latitude: args?.value(forKey: "lat") as! Double, longitude: args?.value(forKey:"lng") as! Double));
+        result([point.x,point.y])
+    }
     
     func updateMarker(_ args: NSDictionary?,_ result:FlutterResult){
         let marker = markers[args?.value(forKey: "id") as! String]

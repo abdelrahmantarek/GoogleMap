@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:low_calories_google_map_example/app/main_app_view.dart';
+import 'package:low_calories_google_map_example/info_window/info_window_view.dart';
 import 'package:low_calories_google_map_example/navigation/navigation_view.dart';
 
 import 'main_logic.dart';
@@ -28,6 +30,23 @@ class _MainPageState extends State<MainPage> {
                 Get.toNamed(NavigationPage.routeName);
               },
             ),
+
+            ItemPage(
+              title: "Info Window",
+              subTitle: "info window - route - markers",
+              onTap: (){
+                Get.toNamed(InfoWindowPage.routeName);
+              },
+            ),
+
+            ItemPage(
+              title: "App Test",
+              subTitle: "for - test - new app",
+              onTap: (){
+                Get.toNamed(MainAppPage.routeName);
+              },
+            ),
+
 
             SizedBox(height: Get.height * 10 / 100,),
 

@@ -4,7 +4,7 @@ import GoogleMaps
 import CoreLocation
 
 
-class FLNativeView: NSObject, FlutterPlatformView,GMSMapViewDelegate {
+class FLNativeView: NSObject, FlutterPlatformView {
     
     
     let controller : MapViewController = MapViewController()
@@ -12,11 +12,11 @@ class FLNativeView: NSObject, FlutterPlatformView,GMSMapViewDelegate {
     let locationUpdate : LocationUpdate = LocationUpdate()
     let location : Location = Location()
     let polyLine : PolyLine = PolyLine()
-    
+    var googlemapViewListener : GooglemapViewListener = GooglemapViewListener();
     
     
     private var _view: UIView
-    private var mapLoaded : Bool = false
+
 
     
     init(
@@ -35,6 +35,7 @@ class FLNativeView: NSObject, FlutterPlatformView,GMSMapViewDelegate {
         headingUpdate.headingChannel = FlutterEventChannel(name: "low_calories_google_map/headingUpdate_\(viewId)",binaryMessenger:  messenger!)
         locationUpdate.locationUpdateChannel = FlutterEventChannel(name: "low_calories_google_map/locationUpdate_\(viewId)",binaryMessenger:  messenger!)
   
+
         
         super.init();
 
@@ -73,6 +74,9 @@ class FLNativeView: NSObject, FlutterPlatformView,GMSMapViewDelegate {
         break;
       case "paddingMap":
             controller.paddingMap(call.arguments as? NSDictionary,result)
+        break;
+      case "getPointScreenFromMapView":
+            controller.getPointScreenFromMapView(call.arguments as? NSDictionary,result)
         break;
       case "getLocation":
         location.getLocation(result)
@@ -114,32 +118,53 @@ class FLNativeView: NSObject, FlutterPlatformView,GMSMapViewDelegate {
     
     func createNativeView(view _view: UIView){
         _view.addSubview(controller.mapView)
-        controller.mapView.delegate = self
+         googlemapViewListener.addListener(controller)
     }
         
     
-    // MARK: GMSMapViewDelegate
+    
 
-    func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
-      print("You tapped at \(coordinate.latitude), \(coordinate.longitude)")
-    }
     
-    
-    func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
-        if mapLoaded == false{
-            self.onMapReady()
-        }
-    }
-    
-    
-    func onMapReady(){
-        print("map is Ready")
-        mapLoaded = true
-        controller.methodChannel?.invokeMethod("onMapCreate", arguments: true)
-    }
- 
-   
-
     
 }
 
+
+
+class GooglemapViewListener: NSObject,GMSMapViewDelegate {
+    
+
+    var controller : MapViewController = MapViewController()
+    
+ 
+    
+    func addListener(_ con:MapViewController) {
+        controller = con;
+        controller.mapView.delegate = self
+    }
+    
+    
+    func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
+      print("You tapped at \(coordinate.latitude), \(coordinate.longitude)")
+    }
+
+    
+  
+    func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
+        if(position.target.latitude == 0.0){
+            return
+        }
+        self.controller.methodChannel?.invokeMethod("onCameraIdl", arguments:[position.target.latitude,position.target.longitude])
+    }
+
+
+    func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
+        controller.mapView.delegate?.mapView?(controller.mapView, idleAt: GMSCameraPosition.init(latitude: 0.0, longitude: 0.0, zoom: 0.0))
+        controller.methodChannel?.invokeMethod("onCameraMove", arguments:[position.target.latitude,position.target.longitude])
+    }
+    
+    
+    func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
+    
+    }
+
+}

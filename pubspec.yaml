@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
 
   vector_math: any
+  get: any
+
 
 
 dev_dependencies:

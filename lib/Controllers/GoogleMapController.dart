@@ -2,10 +2,13 @@
 
 
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:low_calories_google_map/Widget/PopAskOpenGpsIos.dart';
 import 'package:low_calories_google_map/low_calories_google_map.dart';
+import 'package:low_calories_google_map/marker_view/marker_view_logic.dart';
 import 'package:low_calories_google_map/model/Styles.dart';
 import 'package:low_calories_google_map/GoogleMapView.dart';
 import 'package:low_calories_google_map/model/UnknownMapIDError.dart';
@@ -14,41 +17,39 @@ import 'package:low_calories_google_map/model/UnknownMapIDError.dart';
 
 
 
-class GoogleMapController{
+class GoogleMapController extends GetxController{
 
 
-  final int mapId;
-  final Map<int, MethodChannel> _channels = {};
-  final GoogleMapViewState _googleMapState;
+
+   int? mapId;
+   Map<int, MethodChannel>? _channels = {};
+   GoogleMapViewState? _googleMapState;
 
 
-  GoogleMapController._(this._googleMapState, {required this.mapId,}){
+   GoogleMapController();
+
+
+  init(GoogleMapViewState state,int mapId){
+    this.mapId = mapId;
+    this._googleMapState = state;
     ensureChannelInitialized(mapId);
-  }
-
-
-  static Future<GoogleMapController> init(int id, GoogleMapViewState googleMapState,) async {
-    return GoogleMapController._(
-      googleMapState,
-      mapId: id,
-    );
   }
 
 
   @visibleForTesting
   MethodChannel ensureChannelInitialized(int mapId) {
-    MethodChannel? channel = _channels[mapId];
+    MethodChannel? channel = _channels![mapId];
     if (channel == null) {
       channel = MethodChannel('plugins.flutter.io/google_maps_$mapId');
       channel.setMethodCallHandler((MethodCall call) => _handleMethodCall(call, mapId));
-      _channels[mapId] = channel;
+      _channels![mapId] = channel;
     }
     return channel;
   }
 
   
   MethodChannel channel(int mapId) {
-    MethodChannel? channel = _channels[mapId];
+    MethodChannel? channel = _channels![mapId];
     if (channel == null) {
       throw UnknownMapIDError(mapId);
     }
@@ -56,10 +57,25 @@ class GoogleMapController{
   }
 
 
-  _handleMethodCall(MethodCall call, int mapId) {
-    print("MethodCall : " + call.method);
+  _handleMethodCall(MethodCall call, int mapId) async{
+    // print("MethodCall : " + call.method);
     switch(call.method){
       case "onMapCreate":
+        break;
+      case "onCameraMove":
+        if(_googleMapState!.widget.onCameraMove!=null) {
+            for(Marker marker in Get.find<MarkerViewLogic>().markers.where((element) => element.child!=null).toList()){
+                // print("update marker : " + marker.id);
+                marker.offset = await getPointScreenFromMapView(marker.position!);
+            }
+            Get.find<MarkerViewLogic>().markers.refresh();
+           _googleMapState!.widget.onCameraMove!(Location(call.arguments[0],call.arguments[1]));
+        }
+        break;
+        case "onCameraIdl":
+        if(_googleMapState!.widget.onCameraIdl!=null) {
+          _googleMapState!.widget.onCameraIdl!(Location(call.arguments[0],call.arguments[1]));
+        }
         break;
       default:
         throw MissingPluginException();
@@ -71,13 +87,13 @@ class GoogleMapController{
 
 
   Future<bool?> get gpsStatusAndroid async {
-    final bool? version = await channel(mapId).invokeMethod('gpsStatusAndroid');
+    final bool? version = await channel(mapId!).invokeMethod('gpsStatusAndroid');
     return version;
   }
 
 
   Future<bool?> get gpsStatusIos async {
-    final bool? version = await channel(mapId).invokeMethod('checkGpsIos');
+    final bool? version = await channel(mapId!).invokeMethod('checkGpsIos');
     return version;
   }
 
@@ -89,18 +105,18 @@ class GoogleMapController{
 
 
   Future<bool?> stopLocationUpdate() async {
-    final bool? version = await channel(mapId).invokeMethod('stopLocationUpdate');
+    final bool? version = await channel(mapId!).invokeMethod('stopLocationUpdate');
     return version;
   }
 
   Future<bool?> stopHeadingUpdate() async {
-    final bool? version = await channel(mapId).invokeMethod('stopHeadingUpdate');
+    final bool? version = await channel(mapId!).invokeMethod('stopHeadingUpdate');
     return version;
   }
 
 
   Future<bool?> startHeadingUpdate() async {
-    final bool? version = await channel(mapId).invokeMethod('startHeadingUpdate');
+    final bool? version = await channel(mapId!).invokeMethod('startHeadingUpdate');
     return version;
   }
 
@@ -116,19 +132,19 @@ class GoogleMapController{
 
 
   Future<bool?> get locationStatusAndroid async {
-    final bool? version = await channel(mapId).invokeMethod('locationStatusAndroid');
+    final bool? version = await channel(mapId!).invokeMethod('locationStatusAndroid');
     return version;
   }
 
 
   Future<bool?> get locationStatusIos async {
-    final bool? version = await channel(mapId).invokeMethod('locationStatusIos');
+    final bool? version = await channel(mapId!).invokeMethod('locationStatusIos');
     return version;
   }
 
 
   Future<bool?>  markerExist(String id) async {
-    final bool? version = await channel(mapId).invokeMethod('markerExist',{"id":id});
+    final bool? version = await channel(mapId!).invokeMethod('markerExist',{"id":id});
     return version;
   }
 
@@ -151,7 +167,7 @@ class GoogleMapController{
 
       bool? location = await locationStatusAndroid;
       if(location! == false){
-        bool data = await channel(mapId).invokeMethod('requestLocationPermissionAndroid');
+        bool data = await channel(mapId!).invokeMethod('requestLocationPermissionAndroid');
         if(data == false){
           return null;
         }
@@ -160,7 +176,7 @@ class GoogleMapController{
 
       bool? gps = await gpsStatusAndroid;
       if(gps! == false){
-        bool data = await channel(mapId).invokeMethod('requestOpenGpsAndroid');
+        bool data = await channel(mapId!).invokeMethod('requestOpenGpsAndroid');
         if(data == false){
           return null;
         }
@@ -174,14 +190,14 @@ class GoogleMapController{
 
 
       bool? gps = await gpsStatusIos;
-      print("gps status =========  " + gps.toString());
+      // print("gps status =========  " + gps.toString());
 
       if(gps! == false){
         bool? result = await showDialog<bool>(context: context!,barrierDismissible: false, builder: (context){
           return PopAskopenGpsIos(
             onGoSettings: ()async{
-              bool data = await channel(mapId).invokeMethod('requestOpenGpsIos');
-              print("gps Request status =========  " + data.toString());
+              bool data = await channel(mapId!).invokeMethod('requestOpenGpsIos');
+              // print("gps Request status =========  " + data.toString());
               Navigator.pop(context,data);
             },
             onCancel: (){
@@ -197,10 +213,10 @@ class GoogleMapController{
 
 
       bool? location = await locationStatusIos;
-      print("permission status =========  " + location.toString());
+      // print("permission status =========  " + location.toString());
       if(location! == false){
-        bool data = await channel(mapId).invokeMethod('requestLocationPermissionIos');
-        print("permission Request result =========  " + data.toString());
+        bool data = await channel(mapId!).invokeMethod('requestLocationPermissionIos');
+        // print("permission Request result =========  " + data.toString());
         if(data == false){
           return null;
         }
@@ -208,7 +224,7 @@ class GoogleMapController{
 
     }
 
-    final dynamic data = await channel(mapId).invokeMethod('getLocation');
+    final dynamic data = await channel(mapId!).invokeMethod('getLocation');
     return Location.fromList(data);
   }
 
@@ -227,7 +243,7 @@ class GoogleMapController{
        list.add([location.lat,location.lng]);
     }
 
-    final String? version = await channel(mapId).invokeMethod('animatePolyLine', [overviewPolyline != null ? decodePolyLine(overviewPolyline) : list]);
+    final String? version = await channel(mapId!).invokeMethod('animatePolyLine', [overviewPolyline != null ? decodePolyLine(overviewPolyline) : list]);
     return version;
   }
 
@@ -236,7 +252,7 @@ class GoogleMapController{
 
 
   Future<bool?> animateTo(Location location,{double zoom = 16.0,double heading = 0.0,double viewingAngle = 0.0}) async {
-    final bool? version = await channel(mapId).invokeMethod('animateToMap',{
+    final bool? version = await channel(mapId!).invokeMethod('animateToMap',{
       "animateToMap.lat":location.lat,
       "animateToMap.lng":location.lng,
       "animateToMap.zoom":zoom,
@@ -244,6 +260,20 @@ class GoogleMapController{
       "animateToMap.viewingAngle":viewingAngle,
     });
     return version;
+  }
+
+
+  Future<Offset?> getPointScreenFromMapView(Location location,{double zoom = 16.0,double heading = 0.0,double viewingAngle = 0.0}) async {
+    dynamic result = await channel(mapId!).invokeMethod('getPointScreenFromMapView',{
+      "lat":location.lat,
+      "lng":location.lng,
+    });
+
+    print("offff");
+    return Offset(0.0, 0.0);
+
+    Point point = Point(result[0], result[1]);
+    return Offset(double.parse(point.x.toDouble().toString().split("e")[0]),double.parse(point.y.toDouble().toString().split("e")[0]));
   }
 
 
@@ -269,7 +299,7 @@ class GoogleMapController{
 
 
   Future<bool?> addMapStyle(MapStyle styleColor) async {
-    final bool? version = await channel(mapId).invokeMethod('mapStyle', {"mapStyle": Styles.getStyle(styleColor)});
+    final bool? version = await channel(mapId!).invokeMethod('mapStyle', {"mapStyle": Styles.getStyle(styleColor)});
     return version;
   }
 
@@ -279,9 +309,20 @@ class GoogleMapController{
 
   Future<bool?> addMarker(Marker marker) async {
 
-    if((await markerExist(marker.id))!){
+
+    return false;
+
+    if(Get.find<MarkerViewLogic>().markers.where((element) => element.id == marker.id).isNotEmpty){
+      print("marker exist id : ${marker.id}");
       return false;
     }
+
+
+    if(marker.child!=null){
+      Get.find<MarkerViewLogic>().markers.add(marker);
+      return true;
+    }
+
 
     String? base64 = await marker.base64String();
 
@@ -307,7 +348,13 @@ class GoogleMapController{
       data.addAll(marker.scaleMarkerAnimation!.toJson());
     }
 
-    bool? version = await channel(mapId).invokeMethod('addMarker', data);
+
+    Get.find<MarkerViewLogic>().markers.add(marker);
+
+    bool? version = await channel(mapId!).invokeMethod('addMarker', data);
+
+
+
 
     return version;
   }
@@ -354,7 +401,7 @@ class GoogleMapController{
       data.addAll(marker.scaleMarkerAnimation!.toJson());
     }
 
-    final bool? version = await channel(mapId).invokeMethod('updateMarker', data);
+    final bool? version = await channel(mapId!).invokeMethod('updateMarker', data);
 
     return version;
   }
@@ -368,7 +415,7 @@ class GoogleMapController{
       "mapPadding.bottom": bottom,
       "mapPadding.right": right,
     };
-    final bool? version = await channel(mapId).invokeMethod('paddingMap', data);
+    final bool? version = await channel(mapId!).invokeMethod('paddingMap', data);
     return version;
   }
 
@@ -377,7 +424,7 @@ class GoogleMapController{
 
 
   Stream<double> get onHeadingUpdate {
-    channel(mapId).invokeMethod('startHeadingUpdate');
+    channel(mapId!).invokeMethod('startHeadingUpdate');
     return EventChannel('low_calories_google_map/headingUpdate_$mapId').receiveBroadcastStream().map<double>((dynamic event) => event);
   }
 
@@ -387,23 +434,23 @@ class GoogleMapController{
     if(location == null){
       return null;
     }
-    channel(mapId).invokeMethod('startLocationUpdate');
+    channel(mapId!).invokeMethod('startLocationUpdate');
     return EventChannel('low_calories_google_map/locationUpdate_$mapId').receiveBroadcastStream().map<Location>((dynamic event) => Location(event[0],event[1]));
   }
 
 
-
-  void dispose() {
-    channel(mapId).setMethodCallHandler(null);
-    stopLocationUpdate();
-    stopHeadingUpdate();
-  }
-
   Future<bool?> addPolyLine(String s, Polyline polyline) async{
-    final bool? version = await channel(mapId).invokeMethod('addPolyLine', polyline.toJson());
+    final bool? version = await channel(mapId!).invokeMethod('addPolyLine', polyline.toJson());
     return version;
   }
 
 
+  @override
+  void onClose() {
+    channel(mapId!).setMethodCallHandler(null);
+    stopLocationUpdate();
+    stopHeadingUpdate();
+    super.onClose();
+  }
 
 }

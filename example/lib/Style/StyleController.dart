@@ -163,7 +163,7 @@ class StyleController with ChangeNotifier{
             bodyText2:TextStyle(
                 fontSize: 10.sp,
                 fontWeight: FontWeight.normal,
-                color: Colors.black,
+                color: Colors.black54,
                 fontFamily: "Prompt"
             ),
             caption:TextStyle(
@@ -172,7 +172,7 @@ class StyleController with ChangeNotifier{
                 color: Colors.grey
             ),
             headline2: Theme.of(context).textTheme.headline2!.copyWith(color: Color(0xFF1CA34A)),
-            bodyText1:Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.white,letterSpacing: 2,)
+            bodyText1:Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.black,letterSpacing: 2,)
         )
     );
   }

@@ -8,6 +8,10 @@ import 'package:get_storage/get_storage.dart';
 import 'dart:async';
 import 'package:low_calories_google_map/low_calories_google_map.dart';
 import 'package:low_calories_google_map_example/Style/StyleController.dart';
+import 'package:low_calories_google_map_example/app/main_app_view.dart';
+import 'package:low_calories_google_map_example/app/pick_up_auto_complete_location/pick_up_auto_complete_location_view.dart';
+import 'package:low_calories_google_map_example/app/pick_up_new_trip/pick_up_new_trip_view.dart';
+import 'package:low_calories_google_map_example/info_window/info_window_view.dart';
 import 'package:low_calories_google_map_example/main/main_view.dart';
 import 'package:low_calories_google_map_example/navigation/navigation_view.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -59,11 +63,19 @@ class MyApp extends StatelessWidget {
             // theme: ThemeApp().themeDark(),
             theme: StyleController().themeData(context),
             getPages: [
-              GetPage(name: NavigationPage.routeName, page: () => NavigationPage(),),
               GetPage(name: MainPage.routeName, page: () => MainPage(),),
+
+              GetPage(name: NavigationPage.routeName, page: () => NavigationPage(),),
+              GetPage(name: InfoWindowPage.routeName, page: () => InfoWindowPage(),),
+
+
+              // main app
+              GetPage(name: MainAppPage.routeName, page: () => MainAppPage(),),
+              GetPage(name: PickUpNewTripPage.routeName, page: () => PickUpNewTripPage()),
+
               //profile settings
             ],
-          )) ,
+          )),
         );
       },
     );

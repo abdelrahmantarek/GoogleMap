@@ -56,7 +56,7 @@ class Location : NSObject, CLLocationManagerDelegate{
     func requestOpenGps(_ result:FlutterResult?){
         self.resultAskGps = result
         if let url = URL(string: UIApplication.openSettingsURLString) {
-            if UIApplication.shared.canOpenURL(url) {
+            if UIApplication.shared.canOpenURL(url){
                UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
         }
@@ -127,7 +127,9 @@ class Location : NSObject, CLLocationManagerDelegate{
     }
 
     
-    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+              print("Error while updating location " + error.localizedDescription)
+    }
     
 }
 

@@ -1,13 +1,13 @@
 PODS:
   - Flutter (1.0.0)
-  - GoogleMaps (4.0.0):
-    - GoogleMaps/Maps (= 4.0.0)
-  - GoogleMaps/Base (4.0.0)
-  - GoogleMaps/Maps (4.0.0):
+  - GoogleMaps (5.1.0):
+    - GoogleMaps/Maps (= 5.1.0)
+  - GoogleMaps/Base (5.1.0)
+  - GoogleMaps/Maps (5.1.0):
     - GoogleMaps/Base
   - low_calories_google_map (0.0.1):
     - Flutter
-    - GoogleMaps (~> 4.0.0)
+    - GoogleMaps (~> 5.1.0)
   - path_provider (0.0.1):
     - Flutter
 
@@ -30,10 +30,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  GoogleMaps: b7f7fc569a9b354a3af0d9729dbec40957b7d41e
-  low_calories_google_map: 1f702f12841f5b202d7964361708567b145b9df9
+  GoogleMaps: 086ae1dab659eaa7339bdb30fc88e2f44e7c597c
+  low_calories_google_map: 5718d859429ce43f52af3d8aa0e79c6648d63014
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
 
 PODFILE CHECKSUM: 4c96e3e0cf7dac1e2888a4a6787abad9188cd611
 
-COCOAPODS: 1.11.0.rc.1
+COCOAPODS: 1.11.2

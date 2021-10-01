@@ -15,6 +15,7 @@ class NavigationLogic extends GetxController {
   StreamSubscription? streamSubscriptionHeadingUpdate;
 
 
+
   Marker get markerMe{
     Marker markerMe = Marker("0", position: lastLocation, assets: "assets/icons/navigation_blue_have_shadows.png",);
     return markerMe;
@@ -86,6 +87,8 @@ class NavigationLogic extends GetxController {
     streamSubscriptionLocationUpdate = stream!.listen((event) {
       lastLocation = event;
     });
+
+
 
   }
 
