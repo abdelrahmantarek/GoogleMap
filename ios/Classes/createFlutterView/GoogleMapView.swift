@@ -17,7 +17,7 @@ class FLNativeView: NSObject, FlutterPlatformView {
     
     private var _view: UIView
 
-
+    
     
     init(
         frame: CGRect,
@@ -28,10 +28,9 @@ class FLNativeView: NSObject, FlutterPlatformView {
         _view = UIView()
 
         controller.methodChannel = FlutterMethodChannel(name: "plugins.flutter.io/google_maps_\(viewId)", binaryMessenger: messenger!);
-        
-       
+        controller.freeChannel = FlutterMethodChannel(name: "plugins.flutter.io/google_maps_free_channel", binaryMessenger: messenger!);
     
-
+        
         headingUpdate.headingChannel = FlutterEventChannel(name: "low_calories_google_map/headingUpdate_\(viewId)",binaryMessenger:  messenger!)
         locationUpdate.locationUpdateChannel = FlutterEventChannel(name: "low_calories_google_map/locationUpdate_\(viewId)",binaryMessenger:  messenger!)
   
@@ -44,6 +43,7 @@ class FLNativeView: NSObject, FlutterPlatformView {
         controller.addMapStyle(initParam)
         
         controller.methodChannel!.setMethodCallHandler(self.handle)
+        controller.freeChannel!.setMethodCallHandler(self.handleFreeChannel)
         createNativeView(view: _view)
     }
     
@@ -109,6 +109,33 @@ class FLNativeView: NSObject, FlutterPlatformView {
             print("default ")
       }
     }
+    
+    
+    public func handleFreeChannel(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+      switch call.method {
+      case "getLocation":
+        location.getLocation(result)
+        break;
+      case "locationStatusIos":
+        location.getLocationStatusPermission(result)
+        break;
+      case "requestLocationPermissionIos":
+        location.requestLocationPermission(result)
+        break;
+      case "checkGpsIos":
+        location.getLocationStatus(result)
+        break;
+      case "requestOpenGpsIos":
+        location.requestOpenGps(result)
+        break;
+      case "startLocationUpdate":
+        locationUpdate.startLocationUpdate(result)
+        break;
+        default:
+            print("default ")
+      }
+    }
+    
     //
 
     func view() -> UIView {

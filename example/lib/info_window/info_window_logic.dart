@@ -27,7 +27,7 @@ class InfoWindowLogic extends GetxController {
 
 
   void getLocation() async{
-    lastLocation = await mapController!.getLocation(Get.context!);
+    lastLocation = await GoogleMapController.getLocation(Get.context!);
     if(lastLocation!=null){
 
       mapController!.animateTo(lastLocation!);

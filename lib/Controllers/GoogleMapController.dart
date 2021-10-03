@@ -20,9 +20,11 @@ import 'package:low_calories_google_map/model/UnknownMapIDError.dart';
 class GoogleMapController extends GetxController{
 
 
+   static MethodChannel _freeChannel = MethodChannel('plugins.flutter.io/google_maps_free_channel');
 
    int? mapId;
    Map<int, MethodChannel>? _channels = {};
+
    GoogleMapViewState? _googleMapState;
 
 
@@ -86,14 +88,14 @@ class GoogleMapController extends GetxController{
 
 
 
-  Future<bool?> get gpsStatusAndroid async {
-    final bool? version = await channel(mapId!).invokeMethod('gpsStatusAndroid');
+  static Future<bool?> get gpsStatusAndroid async {
+    final bool? version = await _freeChannel.invokeMethod('gpsStatusAndroid');
     return version;
   }
 
 
-  Future<bool?> get gpsStatusIos async {
-    final bool? version = await channel(mapId!).invokeMethod('checkGpsIos');
+  static Future<bool?> get gpsStatusIos async {
+    final bool? version = await _freeChannel.invokeMethod('checkGpsIos');
     return version;
   }
 
@@ -131,14 +133,14 @@ class GoogleMapController extends GetxController{
 
 
 
-  Future<bool?> get locationStatusAndroid async {
-    final bool? version = await channel(mapId!).invokeMethod('locationStatusAndroid');
+  static Future<bool?> get locationStatusAndroid async {
+    final bool? version = await _freeChannel.invokeMethod('locationStatusAndroid');
     return version;
   }
 
 
-  Future<bool?> get locationStatusIos async {
-    final bool? version = await channel(mapId!).invokeMethod('locationStatusIos');
+  static Future<bool?> get locationStatusIos async {
+    final bool? version = await _freeChannel.invokeMethod('locationStatusIos');
     return version;
   }
 
@@ -161,13 +163,13 @@ class GoogleMapController extends GetxController{
 
 
 
-  Future<Location?> getLocation(BuildContext? context)async{
+  static Future<Location?> getLocation(BuildContext? context)async{
 
     if(Platform.isAndroid){
 
       bool? location = await locationStatusAndroid;
       if(location! == false){
-        bool data = await channel(mapId!).invokeMethod('requestLocationPermissionAndroid');
+        bool data = await _freeChannel.invokeMethod('requestLocationPermissionAndroid');
         if(data == false){
           return null;
         }
@@ -176,7 +178,7 @@ class GoogleMapController extends GetxController{
 
       bool? gps = await gpsStatusAndroid;
       if(gps! == false){
-        bool data = await channel(mapId!).invokeMethod('requestOpenGpsAndroid');
+        bool data = await _freeChannel.invokeMethod('requestOpenGpsAndroid');
         if(data == false){
           return null;
         }
@@ -196,7 +198,7 @@ class GoogleMapController extends GetxController{
         bool? result = await showDialog<bool>(context: context!,barrierDismissible: false, builder: (context){
           return PopAskopenGpsIos(
             onGoSettings: ()async{
-              bool data = await channel(mapId!).invokeMethod('requestOpenGpsIos');
+              bool data = await _freeChannel.invokeMethod('requestOpenGpsIos');
               // print("gps Request status =========  " + data.toString());
               Navigator.pop(context,data);
             },
@@ -215,7 +217,7 @@ class GoogleMapController extends GetxController{
       bool? location = await locationStatusIos;
       // print("permission status =========  " + location.toString());
       if(location! == false){
-        bool data = await channel(mapId!).invokeMethod('requestLocationPermissionIos');
+        bool data = await _freeChannel.invokeMethod('requestLocationPermissionIos');
         // print("permission Request result =========  " + data.toString());
         if(data == false){
           return null;
@@ -224,7 +226,7 @@ class GoogleMapController extends GetxController{
 
     }
 
-    final dynamic data = await channel(mapId!).invokeMethod('getLocation');
+    final dynamic data = await _freeChannel.invokeMethod('getLocation');
     return Location.fromList(data);
   }
 
@@ -270,7 +272,6 @@ class GoogleMapController extends GetxController{
     });
 
     print("offff");
-    return Offset(0.0, 0.0);
 
     Point point = Point(result[0], result[1]);
     return Offset(double.parse(point.x.toDouble().toString().split("e")[0]),double.parse(point.y.toDouble().toString().split("e")[0]));
@@ -309,13 +310,15 @@ class GoogleMapController extends GetxController{
 
   Future<bool?> addMarker(Marker marker) async {
 
-
-    return false;
+    await Future.delayed(Duration(milliseconds: 200));
 
     if(Get.find<MarkerViewLogic>().markers.where((element) => element.id == marker.id).isNotEmpty){
       print("marker exist id : ${marker.id}");
       return false;
     }
+
+
+    marker.getPositionScreen();
 
 
     if(marker.child!=null){

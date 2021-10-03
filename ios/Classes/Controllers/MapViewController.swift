@@ -25,7 +25,7 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
     var lm:CLLocationManager!
     var markers = [String: GMSMarker]()
     var methodChannel: FlutterMethodChannel?
-    
+    var freeChannel: FlutterMethodChannel?
     
     
     func addMapStyle(_ args: NSDictionary?,_ result:FlutterResult? = nil) {

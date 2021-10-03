@@ -72,7 +72,6 @@ class MapView extends GetView<GoogleMapController> {
 
     final String viewType = 'plugins.flutter.io/google_maps';
 
-
     return Stack(
       children: [
 

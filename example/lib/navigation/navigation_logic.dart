@@ -46,7 +46,7 @@ class NavigationLogic extends GetxController {
 
 
   void getLocation() async{
-    lastLocation = await mapController!.getLocation(Get.context!);
+    lastLocation = await GoogleMapController.getLocation(Get.context!);
     if(lastLocation!=null){
       print("my location : " + lastLocation!.toJson().toString());
       mapController!.animateTo(lastLocation!);

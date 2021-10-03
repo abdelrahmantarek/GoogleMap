@@ -25,66 +25,59 @@ class _PickUpNewTripPageState extends State<PickUpNewTripPage> {
     Widget build(BuildContext context) {
 
       return Scaffold(
-
         body: Stack(
           children: [
 
-            GoogleMapView(
-              mapStyle: MapStyle.Dark,
-              onMapCreate: controller.onMapCreate,
-              onCameraMove: controller.onCameraMove,
-              onCameraIdl: controller.onCameraIdl,
+            SlidingUpPanel(
+              maxHeight: controller.maxHeight.value,
+              minHeight: controller.minHeight.value,
+              parallaxEnabled: true,
+              parallaxOffset: .9,
+              controller: controller.panelController,
+              body:Container(
+                margin: EdgeInsets.only(bottom: controller.minHeight.value),
+                child: GoogleMapView(
+                  mapStyle: MapStyle.Dark,
+                  onMapCreate: controller.onMapCreate,
+                  onCameraMove: controller.onCameraMove,
+                  onCameraIdl: controller.onCameraIdl,
+                ),
+              ),
+
+              panelBuilder: (sc) => Container(),
+
+              onPanelSlide: (double pos) {
+                controller.fabHeight.value = pos * (controller.maxHeight.value - controller.minHeight.value) + controller.initFabHeight.value;
+              },
+              onPanelClosed: (){
+                Get.find<PickUpAutoCompleteLocationLogic>().focusOther.value = false;
+                Get.find<PickUpAutoCompleteLocationLogic>().focusMyLocation.value = false;
+                controller.showAppBar.value = false;
+              },
+              onPanelOpened: (){
+                controller.showAppBar.value = true;
+              },
             ),
 
-            // SlidingUpPanel(
-            //   maxHeight: controller.maxHeight.value,
-            //   minHeight: controller.minHeight.value,
-            //   parallaxEnabled: true,
-            //   parallaxOffset: .9,
-            //   controller: controller.panelController,
-            //   body:Container(
-            //     margin: EdgeInsets.only(bottom: controller.minHeight.value),
-            //     child: GoogleMapView(
-            //       mapStyle: MapStyle.Dark,
-            //       onMapCreate: controller.onMapCreate,
-            //       onCameraMove: controller.onCameraMove,
-            //       onCameraIdl: controller.onCameraIdl,
-            //     ),
-            //   ),
-            //
-            //   panelBuilder: (sc) => PickUpAutoCompleteLocationPage(),
-            //
-            //   onPanelSlide: (double pos) {
-            //     controller.fabHeight.value = pos * (controller.maxHeight.value - controller.minHeight.value) + controller.initFabHeight.value;
-            //   },
-            //   onPanelClosed: (){
-            //     Get.find<PickUpAutoCompleteLocationLogic>().focusOther.value = false;
-            //     Get.find<PickUpAutoCompleteLocationLogic>().focusMyLocation.value = false;
-            //     controller.showAppBar.value = false;
-            //   },
-            //   onPanelOpened: (){
-            //     controller.showAppBar.value = true;
-            //   },
-            // ),
-            //
-            //
-            //
 
-            Obx((){
-              return Positioned(
-                right: 20.0,
-                bottom: controller.fabHeight.value,
-                child: FloatingActionButton(
-                  child: Icon(
-                    Icons.gps_fixed,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  onPressed: controller.getLocation,
-                  backgroundColor: Colors.white,
+            Positioned(top: 0,right: 0,left: 0,child: PickUpAutoCompleteLocationPage(),),
+
+
+
+            Positioned(
+              right: 20.0,
+              bottom: 50.0,
+              child: FloatingActionButton(
+                child: Icon(
+                  Icons.gps_fixed,
+                  color: Theme.of(context).primaryColor,
                 ),
-              );
-            }),
-            //
+                onPressed: controller.getLocation,
+                backgroundColor: Colors.white,
+              ),
+            ),
+
+
 
 
           ],

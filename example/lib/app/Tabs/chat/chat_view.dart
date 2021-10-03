@@ -86,7 +86,7 @@ class _ChatPageState extends State<ChatPage> {
           ItemChat(
             assets: "assets/images/person3.jpg",
             title: "Mohamed Tarek",
-            subTitle: "Hi There i'm please no comment about this",
+            subTitle:"Hi There i'm please no comment about this",
             onTap: () {
 
             },
@@ -96,7 +96,7 @@ class _ChatPageState extends State<ChatPage> {
           ItemChat(
             assets: "assets/images/person4.jpg",
             title: "Mohamed Tarek",
-            subTitle: " There i'm Here neHi ed mment about thi using this s",
+            subTitle: "There i'm Here neHi ed mment about thi using this s",
             onTap: () {},
           ),
 
@@ -146,19 +146,22 @@ class ItemChat extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(title,style: Get.theme.textTheme.bodyText1!.copyWith(fontSize: 15.sp),),
-                subTitle != null ? Text(subTitle!,style: Get.theme.textTheme.bodyText2!.copyWith(fontSize: 10.5.sp),) : Container(),
+                Text(title,maxLines: 1,style: Get.theme.textTheme.bodyText1!.copyWith(fontSize: 15.sp),),
+                subTitle != null ? Container(
+                  margin: EdgeInsets.symmetric(horizontal: 2),
+                  child: Text(subTitle!,maxLines: 3,textAlign: TextAlign.start,style: Get.theme.textTheme.bodyText2!.copyWith(fontSize: 11.0.sp),),
+                ) : Container(),
               ],
             )),
 
-            childIcon ?? Column(
+            Expanded(child: childIcon ?? Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Icon(Icons.circle,color: Colors.green,size: 18,),
                 Text("04:00 Am",style: Get.textTheme.bodyText2!.copyWith(fontSize: 8.5.sp),)
               ],
-            )
+            ))
 
 
           ],

@@ -39,13 +39,7 @@ class Marker {
     this.opacity = 1.0,
     this.marginY,
     this.marginX,
-  }){
-
-    Get.find<GoogleMapController>().getPointScreenFromMapView(position!).then((value){
-      offset = value;
-    });
-
-  }
+  });
 
   Future<String?> base64String() async {
     ByteData bytes = await rootBundle.load(assets!);
@@ -63,12 +57,22 @@ class Marker {
     return offset!.dx + marginX!;
   }
 
+
   double getY() {
     if(marginY == null){
       return offset!.dy;
     }
     return offset!.dy + marginY!;
   }
+
+
+  void getPositionScreen() {
+    Get.find<GoogleMapController>().getPointScreenFromMapView(position!).then((value){
+      print(value.toString());
+      offset = value;
+    });
+  }
+
 
 }
 
