@@ -29,18 +29,22 @@ class PickUpNewTripLogic extends GetxController{
     super.onClose();
   }
 
+
   void onMapCreate(GoogleMapController controller) {
      mapController = controller;
      getLocation();
   }
 
+
   void onCameraMove(Location value) {
     pinWork.value = true;
   }
 
+
   void onCameraIdl(Location value) {
     pinWork.value = false;
   }
+
 
   void getLocation() async{
     Location? lastLocation = await GoogleMapController.getLocation(Get.context!);
@@ -54,14 +58,14 @@ class PickUpNewTripLogic extends GetxController{
   }
 
 
-
-
   void showPickUpLocation1() {
 
   }
 
+
   void showPickUpLocation2() {
 
   }
+
 
 }
