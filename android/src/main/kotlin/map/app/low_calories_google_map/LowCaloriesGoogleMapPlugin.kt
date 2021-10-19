@@ -20,29 +20,29 @@ class LowCaloriesGoogleMapPlugin: FlutterPlugin, MethodCallHandler ,ActivityAwar
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
+  private lateinit var free_channel : MethodChannel
   lateinit var helper : Helper
 
 
 
-
-  companion object {
-    @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val channel = MethodChannel(registrar.messenger(), "low_calories_google_map")
-      channel.setMethodCallHandler(LowCaloriesGoogleMapPlugin())
-      // clearing temporary files from previous session
-//      with(registrar.context().cacheDir) {
-//        list { _, name -> name.matches("sound(.*)pool".toRegex())
-//        }.forEach { File(this, it).delete() } }
-    }
-  }
+//
+//  companion object {
+//    @JvmStatic
+//    fun registerWith(registrar: Registrar) {
+//      val channel = MethodChannel(registrar.messenger(), "low_calories_google_map")
+//      channel.setMethodCallHandler(LowCaloriesGoogleMapPlugin())
+//      // clearing temporary files from previous session
+////      with(registrar.context().cacheDir) {
+////        list { _, name -> name.matches("sound(.*)pool".toRegex())
+////        }.forEach { File(this, it).delete() } }
+//    }
+//  }
 
 
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "low_calories_google_map")
-    channel.setMethodCallHandler(this)
+    free_channel = MethodChannel(flutterPluginBinding.binaryMessenger, "plugins.flutter.io/google_maps_free_channel")
+    free_channel.setMethodCallHandler(this)
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -60,7 +60,8 @@ class LowCaloriesGoogleMapPlugin: FlutterPlugin, MethodCallHandler ,ActivityAwar
 
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
+
+    free_channel.setMethodCallHandler(null)
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
