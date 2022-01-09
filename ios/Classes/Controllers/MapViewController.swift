@@ -160,7 +160,8 @@ class MapViewController: NSObject, CLLocationManagerDelegate{
                 animation.toValue = args?.value(forKey: "scale.toValue") as! Double
                 animation.isRemovedOnCompletion = false
                 animation.autoreverses = args?.value(forKey: "scale.autoReverses") as! Bool
-                pulseMarker.iconView?.layer.add(animation, forKey: args?.value(forKey: "id") as! String)
+                let key = args?.value(forKey: "id") as! String
+                pulseMarker.iconView?.layer.add(animation, forKey: key)
             }
         }
         if args?.object(forKey: "heading") != nil {

@@ -31,14 +31,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
           Container(
             margin: EdgeInsets.only(left: 20),
-            child: Text("Settings",style: Get.textTheme.title!.copyWith(fontSize: 40.sp),),
+            child: Text("Settings",style: Get.textTheme.bodyText1!.copyWith(fontSize: 40.sp),),
           ),
 
           SizedBox(height: 50,),
 
           Container(
             margin: EdgeInsets.only(left: 20),
-            child: Text("Account",style: Get.textTheme.title!.copyWith(fontSize: 20.sp),),
+            child: Text("Account",style: Get.textTheme.bodyText1!.copyWith(fontSize: 20.sp),),
           ),
 
           SizedBox(height: 50,),
@@ -56,7 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
           Container(
             margin: EdgeInsets.only(left: 20),
-            child: Text("Settings",style: Get.textTheme.title!.copyWith(fontSize: 25.sp),),
+            child: Text("Settings",style: Get.textTheme.bodyText1!.copyWith(fontSize: 25.sp),),
           ),
 
           SizedBox(height: 50,),

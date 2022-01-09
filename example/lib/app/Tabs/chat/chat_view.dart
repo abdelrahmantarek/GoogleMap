@@ -28,7 +28,7 @@ class _ChatPageState extends State<ChatPage> {
 
           Container(
             margin: EdgeInsets.only(left: 20),
-            child: Text("Messages",style: Get.textTheme.title!.copyWith(fontSize: 40.sp),),
+            child: Text("Messages",style: Get.textTheme.bodyText1!.copyWith(fontSize: 40.sp),),
           ),
 
           SizedBox(height: 50,),

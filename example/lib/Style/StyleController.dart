@@ -111,7 +111,7 @@ class StyleController with ChangeNotifier{
         appBarTheme: AppBarTheme(
             elevation: 0,
             textTheme: TextTheme(
-                title: TextStyle(
+              bodyText1: TextStyle(
                     fontWeight: FontWeight.bold,
                     color:  Color(0xFF1CA34A),
                   fontSize: 14.sp
