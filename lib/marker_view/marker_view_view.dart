@@ -10,7 +10,7 @@ class MarkerViewPage extends GetView<MarkerViewLogic> {
   Widget build(BuildContext context) {
     return Obx((){
       return Positioned.fill(child: Stack(
-        overflow: Overflow.visible,
+        clipBehavior: Clip.none,
         children: controller.markers.where((element) => element.child!=null && element.offset!=null).map<Widget>((e){
           Offset offset = Offset(e.getX(), e.getY());
           return Positioned.fromRect(rect: Rect.fromCenter(center: offset, width: e.width!, height: e.height!), child: Container(

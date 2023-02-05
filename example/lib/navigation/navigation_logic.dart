@@ -41,10 +41,6 @@ class NavigationLogic extends GetxController {
     mapController = value;
   }
 
-
-
-
-
   void getLocation() async{
     lastLocation = await GoogleMapController.getLocation(Get.context!);
     if(lastLocation!=null){

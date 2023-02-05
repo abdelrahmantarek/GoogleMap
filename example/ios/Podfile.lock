@@ -29,7 +29,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   GoogleMaps: 086ae1dab659eaa7339bdb30fc88e2f44e7c597c
   low_calories_google_map: 5718d859429ce43f52af3d8aa0e79c6648d63014
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
