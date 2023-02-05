@@ -81,10 +81,12 @@ class MapView extends GetView<GoogleMapController> {
           creationParams: {"mapStyle": Styles.getStyle(state!.widget.mapStyle!)},
           onPlatformViewCreated: state!.onPlatformViewCreated,
           creationParamsCodec: const StandardMessageCodec(),
-        ) : Scaffold(
-          body: Center(
-            child: Text("is Android"),
-          ),
+        ) : AndroidView(
+            viewType: viewType,
+          layoutDirection: TextDirection.rtl,
+          creationParams: {"mapStyle": Styles.getStyle(state!.widget.mapStyle!)},
+          onPlatformViewCreated: state!.onPlatformViewCreated,
+          creationParamsCodec: const StandardMessageCodec(),
         ),
 
         MarkerViewPage(),
