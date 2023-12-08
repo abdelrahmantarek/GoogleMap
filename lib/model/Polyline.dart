@@ -1,5 +1,6 @@
 
 
+import 'dart:io';
 import 'dart:math' show pow, sin, cos, pi, sqrt;
 
 
@@ -257,7 +258,7 @@ class PolylineDecoded {
   /// @return {double} haversine
   dynamic _haversine(double number) {
     if(number == null) {
-      throw NullThrownError;
+      throw throw HttpException("");
     }
     return pow(sin(number / 2), 2);
   }
@@ -269,8 +270,8 @@ class PolylineDecoded {
   /// @param {List<double>} point2 - lat, lon are mandatory
   /// @return {double} distance
   double _haversineDistance(List<double> _point1, List<double> _point2) {
-    _point1.map((item) => item != null ?  _degToRad(item) : throw NullThrownError);
-    _point2.map((item) => item != null ?  _degToRad(item) : throw NullThrownError);
+    _point1.map((item) => item != null ?  _degToRad(item) : throw HttpException(""));
+    _point2.map((item) => item != null ?  _degToRad(item) : throw HttpException(""));
 
     const radius = 6371;
     final point1 = [_point1[0], _point1[1] ];

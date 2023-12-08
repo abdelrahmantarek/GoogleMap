@@ -1,9 +1,0 @@
-
-
-
-enum StyleApp{
-  LIGHT,
-  DARK
-}
-
-
